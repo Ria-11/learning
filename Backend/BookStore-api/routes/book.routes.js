@@ -1,78 +1,18 @@
 const express = require('express');
-const { BOOKS }= require('../db/book');
+const controller = require('../controllers/book.controller.js');
 const  router = express.Router();
 
-router.get('/', (req, res) => {
-    res.json(BOOKS);
-});
+router.get('/', controller.getAllBooks);
 
-router.get('/:id', (req, res) => {
-    const bookId = parseInt(req.params.id);
+router.get('/:id', controller.getBookById);
 
 
-    if (isNaN(bookId)) {
-        return res.status(400).json({ message: 'Invalid book ID' });
-    }
-
-    const book = BOOKS.find(b => b.id === bookId);
-    if (book) {
-        res.json(book);
-    } else {
-        res.status(404).json({ message: 'Book not found' });
-    }
-});
 
 
-router.post('/', (req, res) => {
-    const { title, author } = req.body;
-    if (!title || !author) {
-        return res.status(400).json({ message: 'Title and author are required' });
-    }
-    const newBook = {
-        id: BOOKS.length + 1
-        , title,
-        author
-    };
-    BOOKS.push(newBook);
-    res.status(201).json(newBook);
-});
+
+router.post('/', controller.createBook);
 
 
-router.post('/', (req, res) => {
-    console.log("BODY:", req.body); // debug
-
-    const { title, author } = req.body || {};
-
-    if (!title || !author) {
-        return res.status(400).json({
-            message: "Title and author are required"
-        });
-    }
-
-    const newBook = {
-        id: BOOKS.length + 1,
-        title,
-        author
-    };
-
-    BOOKS.push(newBook);
-
-    res.status(201).json(newBook);
-});
-
-
-router.delete('/:id', (req, res) => {
-    const bookId = parseInt(req.params.id);
-    if (isNaN(bookId)) {
-        return res.status(400).json({ message: 'Invalid book ID' });
-    }
-    const bookIndex = BOOKS.findIndex(b => b.id === bookId);
-    if (bookIndex !== -1) {
-        BOOKS.splice(bookIndex, 1);
-        res.json({ message: 'Book deleted successfully' });
-    } else {
-        res.status(404).json({ message: 'Book not found' });
-    }
-});
+router.delete('/:id', controller.deleteBook);
 
 module.exports = router;
